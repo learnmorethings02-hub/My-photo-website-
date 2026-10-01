@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Filter</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      margin: 15px;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 400px;
+      margin: 20px 0;
+      border-radius: 10px;
+      display: none;
+    }
+
+    select, button {
+      padding: 12px 18px;
+      margin: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+      background: black;
+      color: white;
+    }
+
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>📷 Photo Filter</h1>
+
+    <p>Upload your photo and choose a filter</p>
+
+    <input type="file" id="photoInput" accept="image/*">
+
+    <br>
+
+    <img id="photo">
+
+    <br>
+
+    <select id="filter">
+      <option value="none">Original</option>
+      <option value="grayscale(100%)">Black & White</option>
+      <option value="sepia(100%)">Sepia</option>
+      <option value="brightness(130%)">Bright</option>
+      <option value="contrast(150%)">High Contrast</option>
+      <option value="saturate(180%)">Color Boost</option>
+    </select>
+
+    <br>
+
+    <button id="downloadBtn" disabled>Download Photo</button>
+
+  </div>
+
+  <script>
+    const photoInput = document.getElementById("photoInput");
+    const photo = document.getElementById("photo");
+    const filter = document.getElementById("filter");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    photoInput.addEventListener("change", function () {
+      const file = this.files[0];
+
+      if (file) {
+        photo.src = URL.createObjectURL(file);
+        photo.style.display = "block";
+        downloadBtn.disabled = false;
+      }
+    });
+
+    filter.addEventListener("change", function () {
+      photo.style.filter = this.value;
+    });
+
+    downloadBtn.addEventListener("click", function () {
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const image = new Image();
+
+      image.onload = function () {
+
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+
+        ctx.filter = filter.value;
+
+        ctx.drawImage(image, 0, 0);
+
+        const link = document.createElement("a");
+
+        link.download = "filtered-photo.png";
+        link.href = canvas.toDataURL("image/png");
+
+        link.click();
+      };
+
+      image.src = photo.src;
+    });
+  </script>
+
+</body>
+</html>
